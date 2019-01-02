@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>C.I des épaves</title>
+  
+<link rel="stylesheet" href="https://js.arcgis.com/3.26/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/fileupload.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.26/esri/css/esri.css">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+  
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+	  margin-left: 40px; /* Same as the width of the sidenav */
+    font-size: 28px; /* Increased text to enable scrolling */
+    padding: 0px 10px;
+    }
+	
+	.signupbtn {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+	margin-left: 22px;
+    padding: 10px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+	.input{
+	height: 20px;
+	width: 120px;
+	margin-left: 15px;
+	
+	}
+	
+	.sidenav {
+    height: 100%;
+    width: 160px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+  </style>
+
+  
+  <script src="https://js.arcgis.com/4.9/"></script>
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/layers/CSVLayer",
+      "esri/views/SceneView",
+      "esri/core/urlUtils",
+	  "esri/WebScene",
+      "esri/layers/FeatureLayer",
+      "esri/layers/SceneLayer",
+      "esri/tasks/support/Query"
+    ], function(
+      Map,
+      CSVLayer,
+      SceneView,
+      urlUtils
+    ) {
+
+      // If CSV files are not on the same domain as your website, a CORS enabled server
+      // or a proxy is required.
+      var url =
+        "http://localhost/PFA3/epaves.csv";
+
+      // Paste the url into a browser's address bar to download and view the attributes
+      // in the CSV file. These attributes include:
+      // * mag - magnitude
+      // * type - earthquake or other event such as nuclear test
+      // * place - location of the event
+      // * time - the time of the event
+
+      var template = {
+        title: "{nom}",
+        content: "Taille = {taille}. \n -- Nationalité = {nationalite}. -- type = {type}. -- Profondeur = {profondeur}."
+      };
+	  
+	   var template1 = {
+        title: "{nom}",
+        content: "Taille = {taille}. \n -- Nationalité = {nationalite}. -- type = {type}. -- Profondeur = {profondeur}."
+      };
+
+      var csvLayer = new CSVLayer({
+        url: url,
+        copyright: "USGS Earthquakes",
+        popupTemplate: template1,
+        elevationInfo: {
+          // drapes icons on the surface of the globe
+          mode: "on-the-ground"
+        }
+      });
+	  
+	   var csvLayerr = new CSVLayer({
+        url: url,
+        copyright: "USGS Earthquakes",
+        popupTemplate: template,
+        elevationInfo: {
+          // drapes icons on the surface of the globe
+          mode: "on-the-ground"
+        }
+      });
+	  
+	  csvLayerr.renderer = {
+        type: "simple", // autocasts as new SimpleRenderer()
+        symbol: {
+          type: "point-3d", // autocasts as new PointSymbol3D()
+          symbolLayers: [{
+            type: "icon", // autocasts as new IconSymbol3DLayer()
+            material: {
+              color: [238, 69, 0, 0.75]
+            },
+            outline: {
+              width: 0.5,
+              color: "white"
+            },
+            size: "12px"
+          }]
+        }
+      };
+
+      var symbol2 = {
+  type: "web-style",  // autocasts as new WebStyleSymbol()
+  styleName: "EsriRealisticTransportationStyle",
+  name: "Motorboat",
+  size: "30px"
+};
+
+
+
+	  csvLayer.renderer = {
+      type: "simple",  // autocasts as new SimpleRenderer()
+  symbol: symbol2  
+      };
+	  
+	  
+
+      var map = new Map({
+        basemap: "satellite",
+        ground: "world-elevation",
+        layers: [csvLayer, csvLayerr]
+      });
+
+      var view = new SceneView({
+        container: "viewDiv",
+        center: [11.0833333333333, 34.4166666666667],
+        zoom: 7,
+        map: map
+      });
+
+    });
+  </script>
+</head>
+
+<body>
+
+<div class="sidenav">
+
+<form method="GET"   action="Traitement.php">
+
+<a style="color:#FFFF" >Ajouter une épave:</a>
+<br /> 
+<label style="color:#FFFF" for="Nom"><b>Nom</b></label>
+      <input class="input" type="text" placeholder="Veuillez indiquer le nom du bateau" name="Nom" required>
+
+<label style="color:#FFFF"  for="Long"><b>Longitude</b></label>
+      <input class="input" type="text" placeholder="Veuillez indiquer la longitude" name="Long" required>
+  
+<label style="color:#FFFF"  for="lat"><b>Latitude</b></label>
+      <input class="input" type="text" placeholder="Veuillez indiquer la Latitude" name="Lat" required>
+	  
+<label style="color:#FFFF"  for="taille"><b>Taille</b></label>
+      <input class="input" type="text" placeholder="Veuillez indiquer la Taille" name="taille" >
+	  	  
+	 
+<label style="color:#FFFF"  for="nat"><b>Nationalité</b></label>
+      <input class="input" type="text" placeholder="Veuillez indiquer la Latitude" name="nat" >
+	 
+<label style="color:#FFFF"  for="type"><b>Type</b></label>
+      <input class="input" type="text" placeholder="Veuillez indiquer la Latitude" name="type" >	 
+	 
+<label style="color:#FFFF"  for="prof"><b>Pronfondeur</b></label>
+      <input class="input"  type="text" placeholder="Veuillez indiquer la Latitude" name="prof" >	 
+	 
+	 <br /> <br /> 
+       <button  type="submit" class="signupbtn"   id="btn4">Ajouter</button>
+  </form>
+
+</div>
+    <div id="viewDiv" />
+
+
+</body>
+
+</html>
